@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Библиотека КД</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    /* ───── Верхняя панель ───── */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      background: rgba(92, 64, 51, 0.95);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      box-sizing: border-box;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    .logo {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 24px;
+      color: #fff;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+      transition: color 0.25s;
+      cursor: pointer;
+    }
+
+    .nav-links a:hover { color: #b8860b; }
+
+    /* ───── Основные стили страницы ───── */
+    body {
+      margin: 0;
+      padding-top: 100px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url("pngtree-an-old-bookcase-in-a-library-image_2642908.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      transition: all 0.5s ease;
+    }
+
+    body.home-active .topbar {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    section {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 80vh;
+      text-align: center;
+      padding: 30px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    section.active {
+      display: flex;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ───── Главная ───── */
+    .home-section {
+      height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(rgba(20,10,0,0.6), rgba(20,10,0,0.85)),
+                  url("pngtree-an-old-bookcase-in-a-library-image_2642908.jpg") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .home-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      width: 90%;
+      max-width: 1200px;
+      color: #fff;
+      gap: 30px;
+    }
+
+    .home-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px;
+      background: rgba(60, 30, 10, 0.55);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .home-title h1 { font-family: 'Georgia', serif; font-size: 60px; color: #ffd700; text-shadow: 3px 3px 12px rgba(0,0,0,0.6); margin-bottom: 10px; }
+    .home-title span { color: #fff; text-shadow: 0 0 10px #fff; }
+    .home-title p { font-size: 20px; color: #f5deb3; margin-top: 5px; }
+
+    .home-author { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 40px; }
+    .home-author img { width: 300px; height: 300px; border-radius: 15px; border: 4px solid #ffd700; object-fit: cover; box-shadow: 0 10px 25px rgba(0,0,0,0.6); transition: transform 0.4s ease, box-shadow 0.4s ease; }
+    .home-author img:hover { transform: scale(1.03); box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
+    .home-author h3 { color: #ffd700; margin: 0; font-size: 22px; }
+    .home-author p { color: #fff; font-size: 20px; margin: 5px 0 0; }
+
+    .home-right { display: flex; align-items: center; justify-content: center; }
+    .home-menu { display: flex; flex-direction: column; gap: 20px; background: rgba(255,255,255,0.08); padding: 40px; border-radius: 15px; text-align: left; box-shadow: 0 4px 20px rgba(0,0,0,0.3); backdrop-filter: blur(6px); }
+    .home-menu a { font-size: 22px; color: #fff; text-decoration: none; transition: all 0.3s; }
+    .home-menu a:hover { color: #ffd700; transform: translateX(6px); }
+
+    /* ───── Общие секции ───── */
+    .fade-slide-in { opacity: 0; transform: translateY(-20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .fade-slide-in.active { opacity: 1; transform: translateY(0); }
+
+    /* ───── Секция поиска ───── */
+    .search-section, .about-section, .feedback-section {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 70px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 30px 20px;
+      background: rgba(0,0,0,0.6);
+      overflow-y: auto;
+      z-index: 999;
+    }
+
+    .search-box { width: 80%; max-width: 900px; margin-bottom: 20px; flex-shrink: 0; }
+    .search-box input { width: 100%; padding: 18px; border-radius: 12px; border: none; font-size: 20px; text-align: center; outline: none; background: #fffaf3; box-shadow: 0 6px 14px rgba(0,0,0,0.15); }
+    .book-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 15px; width: 90%; margin: 0 auto; flex-grow: 1; overflow-y: auto; }
+    .book { background: #fff; color: #333; padding: 15px; border-radius: 10px; box-shadow: 0 6px 14px rgba(0,0,0,0.2); transition: transform 0.4s ease, box-shadow 0.4s ease; }
+    .book:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 12px 25px rgba(0,0,0,0.3); }
+    .book img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+    .book a { color: #6a0dad; text-decoration: none; font-weight: bold; font-size: 17px; }
+    .book em { color: #555; font-size: 14px; display: block; margin-top: 5px; }
+
+    .about-content, .feedback-content { width: 90%; max-width: 600px; display: flex; flex-direction: column; gap: 15px; color: #fff; }
+    .about-content img, .about-content video { width: 100%; border-radius: 10px; margin-top: 15px; box-shadow: 0 6px 14px rgba(0,0,0,0.3); }
+    .feedback-content input, .feedback-content textarea { width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; outline: none; }
+    .feedback-content button { padding: 12px; border: none; border-radius: 8px; background-color: #ffd700; color: #333; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+    .feedback-content button:hover { background-color: #e6c200; }
+
+    footer { background: rgba(92,64,51,0.9); padding: 60px 20px; color: #fff; text-align: center; border-top: 2px solid rgba(255,255,255,0.2); box-shadow: 0 -4px 12px rgba(0,0,0,0.3); }
+  </style>
+</head>
+
+<body>
+<header class="topbar">
+  <div class="logo" id="homeBtn">📚 Библиотека КД</div>
+  <nav class="nav-links">
+    <a id="searchBtn">🔍 Поиск</a>
+    <a id="aboutBtn">ℹ О нас</a>
+    <a href="map.html" target="_blank">🗺 Карта</a>
+    <a id="feedbackBtn">✉ Обратная связь</a>
+  </nav>
+</header>
+
+<!-- Главная -->
+<section class="home-section active" id="home">
+  <div class="home-layout">
+    <div class="home-left">
+      <div class="home-title">
+        <h1>Библиотека <span>КД</span> 📚</h1>
+        <p>Место, где слова обретают жизнь.</p>
+      </div>
+      <div class="home-author">
+        <img src="author.jpg" alt="Фото автора">
+        <div>
+          <h3>Создатель проекта</h3>
+          <p><strong>Кенжебаев Дулат Сейілханұлы</strong></p>
+        </div>
+      </div>
+    </div>
+    <div class="home-right">
+      <nav class="home-menu">
+        <a href="#" onclick="showSection('home')">🏠 Главная</a>
+        <a href="#" onclick="showSection('search')">🔍 Поиск книг</a>
+        <a href="#" onclick="showSection('about')">ℹ О нас</a>
+        <a href="map.html" target="_blank">🗺 Карта</a>
+        <a href="#" onclick="showSection('feedback')">✉ Обратная связь</a>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<!-- Поиск книг -->
+<section class="search-section" id="search">
+  <div class="search-box fade-slide-in">
+    <input id="searchInput" type="text" placeholder="🔍 Поиск по названию или автору...">
+  </div>
+  <div id="bookList" class="book-list fade-slide-in"></div>
+</section>
+
+<!-- О нас -->
+<section class="about-section" id="about">
+  <div class="about-content fade-slide-in">
+    <h2>📚 О библиотеке КД</h2>
+    <p>Библиотека КД — это интерактивная онлайн-библиотека...</p>
+    <div class="media-content">
+      <img src="library-photo.jpg" alt="Фото библиотеки">
+      <video controls preload="metadata">
+        <source src="library-video.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+<!-- Обратная связь -->
+<section class="feedback-section" id="feedback">
+  <div class="feedback-content fade-slide-in">
+    <h2>📩 Обратная связь</h2>
+    <p>Мы будем рады получить ваши вопросы, предложения или отзывы!</p>
+<form id="feedbackForm">
+  <input type="text" name="name" placeholder="Ваше имя" required>
+  <input type="email" name="email" placeholder="Ваш email" required>
+  <textarea name="message" placeholder="Ваше сообщение" rows="5" required></textarea>
+  <button type="submit">Отправить</button>
+</form>
+
+    <div id="feedbackMessage" style="margin-top:15px;color:#ffd700;"></div>
+  </div>
+</section>
+
+<footer>© 2025 Библиотека КД | Все права защищены</footer>
+
+<script>
+const sections = {
+  home: document.getElementById('home'),
+  search: document.getElementById('search'),
+  about: document.getElementById('about'),
+  feedback: document.getElementById('feedback')
+};
+
+function showSection(sectionId) {
+  Object.values(sections).forEach(sec => {
+    sec.classList.remove('active');
+    sec.querySelectorAll('.fade-slide-in').forEach(el => el.classList.remove('active'));
+  });
+
+  const sec = sections[sectionId];
+  sec.classList.add('active');
+  document.body.classList.toggle('home-active', sectionId === 'home');
+  window.scrollTo({ top: 0, behavior: "auto" });
+
+  setTimeout(() => {
+    sec.querySelectorAll('.fade-slide-in').forEach(el => el.classList.add('active'));
+  }, 50);
+}
+
+document.getElementById('homeBtn').addEventListener('click', () => showSection('home'));
+document.getElementById('searchBtn').addEventListener('click', () => showSection('search'));
+document.getElementById('aboutBtn').addEventListener('click', () => showSection('about'));
+document.getElementById('feedbackBtn').addEventListener('click', () => showSection('feedback'));
+
+// Поиск книг
+const bookList = document.getElementById('bookList');
+const searchInput = document.getElementById('searchInput');
+let debounceTimeout;
+
+searchInput.addEventListener('input', (e) => {
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(() => performSearch(e.target.value), 300);
+});
+
+async function performSearch(query) {
+  const q = query.trim();
+  if (!q) { bookList.innerHTML = ""; return; }
+
+  bookList.innerHTML = "<p style='color:#fff;text-align:center;'>🔍 Идёт поиск...</p>";
+
+  try {
+    const resp = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=50`);
+    const data = await resp.json();
+    if (!data.docs.length) {
+      bookList.innerHTML = "<p style='color:#fff;text-align:center;'>Ничего не найдено 😕</p>";
+      return;
+    }
+    bookList.innerHTML = data.docs.map(doc => `
+      <div class="book">
+        <img src="${doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg` : "https://via.placeholder.com/200x300?text=Нет+обложки"}" alt="${doc.title}">
+        <a href="https://openlibrary.org${doc.key}" target="_blank">${doc.title}</a>
+        <em>${doc.author_name ? doc.author_name[0] : "Неизвестный автор"}</em>
+      </div>
+    `).join("");
+  } catch (err) {
+    console.error(err);
+    bookList.innerHTML = "<p style='color:#fff;text-align:center;'>Ошибка загрузки данных 😢</p>";
+  }
+}
+
+// Обратная связь
+const feedbackForm = document.getElementById('feedbackForm');
+const feedbackMessage = document.getElementById('feedbackMessage');
+
+feedbackForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  feedbackMessage.textContent = "Спасибо! Ваше сообщение отправлено.";
+  feedbackForm.reset();
+});
+</script>
+<script type="text/javascript" src="https://cdn.emailjs.com/sdk/3.2/email.min.js"></script>
+<script type="text/javascript">
+  // Инициализация EmailJS с твоим User ID
+  emailjs.init("qqmyzuAacVGEkUSxe"); 
+</script>
+
+<script type="text/javascript">
+document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+  e.preventDefault(); // отключаем перезагрузку страницы
+
+  emailjs.sendForm('service_2ben2yc', 'template_e7xl9r8', this)
+    .then(() => {
+      alert('Сообщение отправлено!');
+      this.reset(); // очищаем форму
+    }, (err) => {
+      alert('Ошибка отправки: ' + JSON.stringify(err));
+    });
+});
+</script>
+
+
+</body>
+</html>
